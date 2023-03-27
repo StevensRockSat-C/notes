@@ -1,0 +1,292 @@
+Jetson:
+root/rocksat
+rocksat
+
+2-3-23
+Install Python & Pip 3.8
+	sudo apt-get install python3.8
+	wget https://bootstrap.pypa.io/get-pip.py get-pip.py
+	python3.8 get-pip.py
+		Pip3.8 might need to be added to the PATH. Add the following line to the end of .bashrc to do such
+			export PATH="/home/rocksat/.local/bin:$PATH"
+		Then source ~/.bashrc
+Install python3.8-dev (sudo apt-get install python3.8-dev)
+Download and install CUDA https://developer.nvidia.com/cuda-downloads (DON'T DO THIS bc: https://forums.developer.nvidia.com/t/cant-install-cuda-on-jetson-nano/240445/2)
+Download (https://developer.nvidia.com/cudnn) and install (https://docs.nvidia.com/deeplearning/sdk/cudnn-install/index.html) cuDNN.
+	I think this step includes installing tensorflow. (sudo pip3.8 install tensorflow)
+Install psutil version 5.7.0 (pip3.8 install psutil==5.7.0)
+AI Benchmark
+	Stock:
+		Install ai-benchmark (pip3.8 install ai-benchmark)
+		Comment out `np.warnings.filterwarnings('ignore')` in __init__.py of ai-benchmark
+	RockSat:
+		Clone https://github.com/StevensRockSat-C-2022-23/ai-benchmark
+		Move the ai_benchmark folder into the python packages folder /home/rocksat/.local/lib/python3.8/site-packages/
+Optional: Install psensor
+
+Run benchmark
+	python3.8
+	from ai_benchmark import AIBenchmark
+	aib = AIBenchmark(verbose_level=2)
+	#results = aib.run_micro() # Inference and Micro take 2GB of RAM while Training takes 4GB
+	results = aib.run_nano()
+	
+2-3-23 3:20 PM Micro test. 16/19. Device Inference Score: 90 Reaches ~52C
+2-3-23 6:30 PM Nano test. 93. Reaches ~50C
+
+Keeps
+	1
+	2
+	4
+	5-6
+	7
+	9-10 Semantic Segmentation
+	15 [120 seconds]
+	
+Maybe
+	11
+	12 [100 seconds]
+
+Remove image processing, since satellites do not need to process images
+	16 [Done]
+	14 [Done]
+	13 [~37 seconds]
+	8
+	3
+	
+Can't find tJuct max of the NVidia Jetson Cortex-A57 https://developer.arm.com/Processors/Cortex-A57#Resources
+
+2-5-23
+Realized that CUDA is fucked somehow. We need a specific version of CUDA for the Jetson Nano. Going to install NVidia Jetpack
+	sudo apt dist-upgrade
+	sudo apt update
+	
+
+2-10-23
+***Re-Flash Nvidia Jetson image using Etcher***
+	On windows:
+		diskpart
+		list disk
+			this gives the number for the disk, fill in for X
+		select disk X
+		clean
+
+Update
+Remove bloatware: sudo apt remove --purge thunderbird* libreoffice* chromium*
+Upgrade
+Install Python & Pip 3.8
+	sudo apt-get install python3.8
+	wget https://bootstrap.pypa.io/get-pip.py get-pip.py
+	python3.8 get-pip.py [note 2-12-23: use sudo here!]
+		Pip3.8 might need to be added to the PATH. Add the following line to the end of .bashrc to do such
+			export PATH="/home/rocksat/.local/bin:$PATH"
+Install python3.8-dev (sudo apt-get install python3.8-dev)
+REBOOT (sudo reboot)
+install tensorflow. (sudo pip3.8 install tensorflow) [tensorflow 2.11.0]
+	sudo pip did NOT work after adding to path, so tensorflow was installed as a user(local) installation [note 2-12-23: use sudo as described above!]
+Install ai-benchmark
+	Same as above, local install
+git clone https://github.com/StevensRockSat-C-2022-23/ai-benchmark.git into the .local/lib/python3.8/site-packages/ folder
+run groundHighPrecision.py
+	TO OUTPUT TO A FILE, use -u option in python to unbuffer the output
+		python3.8 -u groundHighPrecision.py |& tee filename.txt
+	Still not detecting the GPU. 'unable to load libtensorflow_io_plugins'
+	
+2-12-23
+Following https://docs.nvidia.com/deeplearning/frameworks/install-tf-jetson-platform/index.html. Use those commands as they change over time. Using Feb 3, 2023 version
+	sudo apt-get install libhdf5-serial-dev hdf5-tools libhdf5-dev zlib1g-dev zip libjpeg8-dev liblapack-dev libblas-dev gfortran
+	sudo pip3 install -U pip testresources setuptools==65.5.0
+	sudo pip3 install -U numpy==1.21.1 future==0.18.2 mock==3.0.5 keras_preprocessing==1.1.2 keras_applications==1.0.8 gast==0.4.0 protobuf pybind11 cython pkgconfig packaging h5py==3.6.0
+	sudo pip3 install --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v51 tensorflow==2.11.0+nv23.01
+Fix numpy
+	sudo pip3 install numpy --upgrade
+Fix libtensorflow
+	sudo pip3 install tensorflow_io --upgrade
+After doing all of this, checking my versions in python gives me
+	tensorflow_io.__version__ = 0.30.0
+	tensorflow.__version__ = 2.11.0
+	From https://pypi.org/project/tensorflow-io/, these should be compatible with eachother. Yet, I still get the warning 'unable to load libtensorflow_io_plugins'
+Using https://stackoverflow.com/questions/41402409/tensorflow-doesnt-seem-to-see-my-gpu, we can check to confirm that tensorflow STILL doesn't see the GPU
+	from tensorflow.python.client import device_lib
+	device_lib.list_local_devices()
+	--> [name: "/device:CPU:0" ...]
+Did this: https://forums.developer.nvidia.com/t/jetpack-4-6-1-tensorflow-install-issue/241905/3, but no avail
+	sudo ln -s /usr/include/locale.h /usr/include/xlocale.h
+running sudo tegrastats tells me the GPU exists, hooray!
+	Installing sudo pip3 install -U jetson-stats (https://github.com/rbonghi/jetson_stats) should give a better breakdown [sudo jtop]
+	
+2-21-23
+Ran a full high precision micro benchmark on the CPU for the STR Presentation
+
+3-4-23
+Following https://forums.developer.nvidia.com/t/tensorflow-not-using-gpu-of-jetson-nano/242553/3
+	sudo nano ~/.bashrc   add the following lines at the bottom
+		export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
+		export PATH=/usr/local/cuda/bin:$PATH
+	source ~/.bashrc
+run groundHighPrecision.py
+	Didn't work, still getting libtensorflow_io_plugins error
+pip3 install --force-reinstall tensorflow-io
+	Successfully uninstalled libtensorflow-io-gcs-filesystem 0.30.0, installed 0.31.0
+	THIS CLEARED THE ERROR!!
+		Still no GPU, tho
+Reinstlling tensorflow
+	sudo pip3 install --force-reinstall --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v46 tensorflow==2.11.0
+		found existing version tensorflow 2.11.0+nv23.1
+		Successfully installed tensorflow-2.11.0
+		This broke things because 2.11.0 is not the NVidia version and got pulled from the default site
+	Downloading the tensorflow-2.6.2+nv21.12-cp36-cp36m-linux_aarch64.whl from https://developer.download.nvidia.com/compute/redist/jp/v46/tensorflow/ fails to install
+		Not supported on this platform
+	Reinstall JetPackV5.1 tensorflow
+		sudo pip3 install --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v51 tensorflow==2.11.0+nv23.01
+		Running python3.8 groundHighPrecision.py yields a giant new set of errors	
+			libtensorflow-io errors are back, but we also have stuff for libcudart
+				Could not load dynamic library libcudart.so.11 No such file or directory; LD_LIBRARY_PATH: /usr/local/cuda/lib64:
+					WE HAVE CUDA 10 BRUH??? HOW WAS IT WORKING BEFORE???
+					I removed LD_LIBRARY_PATH and PATH=/usr/local/cuda/bin:$PATH, source, reboot, but it still can't load cudart
+
+3-5-23
+Update & Upgrade
+Tried installing tensorflow-2.7.0+nv22.1-cp36-cp36m-linux_aarch64.whl, still fails due to architechture
+sudo pip3 uninstall -y tensorflow
+python3.8
+	import tensorflow as tf
+		THIS DIDN'T FAIL? WTF IS GOING ON?
+pip3 list & sudo pip3 list
+	tensorflow is not in here...!
+	
+3-26-23
+Reinstall tensorflow
+	sudo pip3 install tensorflow --force-reinstall
+Install CUDA through Debian repository
+	wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/sbsa/cuda-ubuntu1804.pin
+	sudo mv cuda-ubuntu1804.pin /etc/apt/preferences.d/cuda-repository-pin-600
+	wget http://developer.download.nvidia.com/compute/cuda/11.0.2/local_installers/cuda-repo-ubuntu1804-11-0-local_11.0.2-450.51.05-1_arm64.deb
+	sudo dpkg -i cuda-repo-ubuntu1804-11-0-local_11.0.2-450.51.05-1_arm64.deb
+	sudo apt-key add /var/cuda-repo-ubuntu1804-11-0-local/7fa2af80.pub
+	sudo apt-get update
+	sudo apt-get -y install cuda
+	Some dependencies could not be installed
+		sudo apt-get -o dpkg::Options::=”–force-overwrite” install –fix-broken
+Install Docker Container
+	Fourm that put us on the right track https://forums.developer.nvidia.com/t/no-gpu-availability-through-tensorflow/234979/2
+	sudo docker pull nvcr.io/nvidia/l4t-tensorflow:r34.1.0-tf1.15-py3
+	sudo docker run -it --rm --runtime nvidia --network host nvcr.io/nvidia/l4t-tensorflow:r34.1.0-tf1.15-py3
+	sudo docker run -it --rm --runtime nvidia --network host -v /home/rocksat:/home/rocksat nvcr.io/nvidia/l4t-tensorflow:r34.1.0-tf1.15-py3 (-v links our directory to the docker's dir)
+		python3.8
+			import tensorflow as tf
+			tf.test.gpu_device_name()
+			TENSOR FLOW SEES GPU!!
+		Run benchmark
+			python3.8
+			from ai_benchmark import AIBenchmark
+			aib = AIBenchmark(verbose_level=2)
+			results = aib.run_nano()
+			Ignoring visible gpu decice The minimum required Cuda capability is 7.0 we have 5.3
+We realized we used a Docker Container for Jetpack 5.0
+Install Docker Container for Jetpack 4.6.1, with Tensorflow 2.7
+	sudo docker pull nvcr.io/nvidia/l4t-tensorflow:r32.7.1-tf2.7-py3
+	sudo docker run -it --rm --runtime nvidia --network host nvcr.io/nvidia/l4t-tensorflow:r32.7.1-tf2.7-py3
+	sudo docker run -it --rm --runtime nvidia --network host -v /home/rocksat:/home/rocksat nvcr.io/nvidia/l4t-tensorflow:r32.7.1-tf2.7-py3
+		python3.6
+			import tensorflow as tf
+			tf.test.gpu_device_name()
+			TENSOR FLOW SEES GPU 
+			ARM64 does not support NUMA
+		pip3 install ai_benchmark
+		python3.6
+			from ai_benchmark import AIBenchmark
+			aib = AIBenchmark(verbose_level=2)
+			results = aib.run_inference()
+			We see GPU and it is clean but it does not run
+			Resource Exhauseted Error
+
+			#This probably needs to be added to aibenchmark script
+				config.gpu_options.allow_growth = True
+				config.gpu_options.per_process_gpu_memory_fraction = 0.4
+		
+		When we leave, everything is reset. Commit your containers to an image with docker container commit.
+		#docker image load -i images.tar to restore previously saved images.
+		Copy over our version of AI_Benchmark
+			cp -r /home/rocksat/.local/lib/python3.8/site-packages/ai-benchmark/ /usr/local/lib/python3.6/dist-packages/ai-benchmark/
+			rm -r /usr/local/lib/python3.6/dist-packages/ai_benchmark/
+			cp -r /home/rocksat/.local/lib/python3.8/site-packages/ai_benchmark/ /usr/local/lib/python3.6/dist-packages/ai_benchmark/
+		
+		apt-get update
+		apt-get install nano
+		
+		modified OUR ai-benchmark utils.py
+			config.gpu_options.allow_growth = True
+			config.gpu_options.per_process_gpu_memory_fraction = 0.4
+			visible_device_list = '0,1' -> '0'
+		
+		run groundHighPrecision.py
+			gpu ram 0.2 GB
+			HOLY SHIT IT WORKS
+			times are significantly faster than CPU
+			Program froze (4/19) had to make new docker  memory .4
+		
+Docker Container
+	sudo docker run -it --rm --runtime nvidia --network host -v /home/rocksat:/home/rocksat nvcr.io/nvidia/l4t-tensorflow:r32.7.1-tf2.7-py3
+	pip3 install ai_benchmark
+	cp -r /home/rocksat/.local/lib/python3.8/site-packages/ai-benchmark/ /usr/local/lib/python3.6/dist-packages/ai-benchmark/
+	rm -r /usr/local/lib/python3.6/dist-packages/ai_benchmark/
+	cp -r /home/rocksat/.local/lib/python3.8/site-packages/ai_benchmark/ /usr/local/lib/python3.6/dist-packages/ai_benchmark/
+	
+	apt-get update
+	apt-get install nano
+	
+	modified OUR ai-benchmark utils.py
+			config.gpu_options.allow_growth = True
+			config.gpu_options.per_process_gpu_memory_fraction = 0.7
+			
+			visible_device_list = '0,1' -> '0'
+			#didnt pull from github
+	run groundHighPrecision.py
+	gpu ram 0.1 GB
+	#test failed (2/19) memory .7 
+	#stopped itself after like 10 min
+	
+EXIT
+sudo docker commit a5666127fabd tensorflow-docker-3-26-23-installed_ai_benchmark
+	Previous Docker	
+		run groundHighPrecision.py
+		gpu ram 0.0
+
+	DOCKER Container	
+		remove cpu growth
+		memory fraction .4
+		run groundHighPrecision.py
+			gpu ram 0.1 GB
+			1/19 takes 14s to run first
+			2/19 crash
+	DOCker Container 
+		remove cpu growth	
+		memory fraction .9
+		run groundHighPrecision.py
+			gpu ram 0.2
+			1/19 14s
+			2/19 5s
+			3/19 crash
+	Docker Container
+		no memory cap
+		no growth
+		run
+			gpu ram .5
+			2/19 5s
+			3/19 6s
+			4/19 8s
+			5/19 3.5s
+			6/19 6.4s
+			7/19 crashed
+	Docker Container	
+		no memory cap
+		yes growth
+		run
+			gpu ram .5
+			2/19 5s
+			3/19 6s
+			4/19 8s
+			5/19 3.5
+			7/19 crash
+			
