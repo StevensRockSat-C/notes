@@ -305,3 +305,27 @@ sudo pip3 install --extra-index-url https://developer.download.nvidia.com/comput
 sudo docker pull nvcr.io/nvidia/l4t-tensorflow:r32.7.1-tf2.7-py3
 
 	
+**REFLASH** Jetpack 4.3.0
+sudo apt update
+sudo apt upgrade
+sudo apt-get install libhdf5-serial-dev hdf5-tools libhdf5-dev zlib1g-dev zip libjpeg8-dev liblapack-dev libblas-dev gfortran
+sudo apt-get install python3-pip
+sudo pip3 install -U pip testresources setuptools==46.3.0
+sudo pip3 install --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v44 tensorflow==2.1.0+nv22.01
+#Download failed
+sudo pip3 install -U numpy grpcio absl-py py-cpuinfo psutil portpicker six mock requests gast h5py astor termcolor protobuf keras-applications keras-preprocessing wrapt goggle-pasta
+sudo pip3 install --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v43 tensorflow==2.1.0+nv20.3
+
+**REFLASH** JP 4.5
+sudo apt update
+sudo apt-get install libhdf5-serial-dev hdf5-tools libhdf5-dev zlib1g-dev zip libjpeg8-dev liblapack-dev libblas-dev gfortran
+sudo apt-get install python3-pip
+sudo pip3 install -U pip testresources setuptools==49.6.0
+sudo pip3 install -U numpy==1.16.1 future==0.17.1 mock==3.0.5 keras_preprocessing==1.0.5 keras_applications==1.0.8 gast==0.2.2 protobuf pybind11 h5py==2.9.0
+sudo pip3 install --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v45 tensorflow==2.3.1+nv20.12
+
+	python3.6
+		import tensorflow as tf
+		tf.test.gpu_device_name()
+		#TENSORFLOW SEES GPU
+		
