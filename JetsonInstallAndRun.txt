@@ -63,7 +63,7 @@ Realized that CUDA is fucked somehow. We need a specific version of CUDA for the
 	
 
 2-10-23
-***Re-Flash Nvidia Jetson image using Etcher***
+***Re-Flash Nvidia Jetson image using Etcher, JP Version 4.6.3/.1 ***
 	On windows:
 		diskpart
 		list disk
@@ -211,15 +211,12 @@ Install Docker Container for Jetpack 4.6.1, with Tensorflow 2.7
 			cp -r /home/rocksat/.local/lib/python3.8/site-packages/ai-benchmark/ /usr/local/lib/python3.6/dist-packages/ai-benchmark/
 			rm -r /usr/local/lib/python3.6/dist-packages/ai_benchmark/
 			cp -r /home/rocksat/.local/lib/python3.8/site-packages/ai_benchmark/ /usr/local/lib/python3.6/dist-packages/ai_benchmark/
-		
 		apt-get update
 		apt-get install nano
-		
 		modified OUR ai-benchmark utils.py
 			config.gpu_options.allow_growth = True
 			config.gpu_options.per_process_gpu_memory_fraction = 0.4
 			visible_device_list = '0,1' -> '0'
-		
 		run groundHighPrecision.py
 			gpu ram 0.2 GB
 			HOLY SHIT IT WORKS
@@ -227,7 +224,7 @@ Install Docker Container for Jetpack 4.6.1, with Tensorflow 2.7
 			Program froze (4/19) had to make new docker  memory .4
 		
 Docker Container
-	sudo docker run -it --rm --runtime nvidia --network host -v /home/rocksat:/home/rocksat nvcr.io/nvidia/l4t-tensorflow:r32.7.1-tf2.7-py3
+sudo docker run -it --rm --runtime nvidia --network host -v /home/rocksat:/home/rocksat nvcr.io/nvidia/l4t-tensorflow:r32.7.1-tf2.7-py3
 	pip3 install ai_benchmark
 	cp -r /home/rocksat/.local/lib/python3.8/site-packages/ai-benchmark/ /usr/local/lib/python3.6/dist-packages/ai-benchmark/
 	rm -r /usr/local/lib/python3.6/dist-packages/ai_benchmark/
@@ -246,12 +243,12 @@ Docker Container
 	gpu ram 0.1 GB
 	#test failed (2/19) memory .7 
 	#stopped itself after like 10 min
-	
-EXIT
+	EXIT
 sudo docker commit a5666127fabd tensorflow-docker-3-26-23-installed_ai_benchmark
-	Previous Docker	
-		run groundHighPrecision.py
-		gpu ram 0.0
+sudo docker run -it --rm --runtime nvidia --network host -v /home/rocksat:/home/rocksat tensorflow-docker-3-26-23-installed_ai_benchmark
+	USE THIS COMMAND TO RUN OUR SAVED DOCKER CONTAINER
+	run groundHighPrecision.py
+	gpu ram 0.0
 
 	DOCKER Container	
 		remove cpu growth
@@ -290,24 +287,21 @@ sudo docker commit a5666127fabd tensorflow-docker-3-26-23-installed_ai_benchmark
 			5/19 3.5
 			7/19 crash
 
-3-27-23
-**REFLASH**
-Remove bloatware: sudo apt remove --purge thunderbird* libreoffice* chromium*
 
+3-27-23
+**FLASH NEW SD CARD to JP 4.6.3/.1** (we'll call this card SD NEW)
+Remove bloatware: sudo apt remove --purge thunderbird* libreoffice* chromium*
 sudo apt-get update
 sudo apt-get upgrade
+We'll use the instructions from https://docs.nvidia.com/deeplearning/frameworks/install-tf-jetson-platform/index.html, removing the version requirements (==) to prevent using too new versions
 sudo apt-get install libhdf5-serial-dev hdf5-tools libhdf5-dev zlib1g-dev zip libjpeg8-dev liblapack-dev libblas-dev gfortran+
-
 sudo apt-get install python3-pip
 sudo python3 -m pip install --upgrade pip
 sudo pip3 install -U testresources setuptools
-
 sudo pip3 install -U numpy future mock keras_preprocessing keras_applications gast protobuf pybind11 cython pkgconfig packaging h5py
-
 sudo pip3 install --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v461 tensorflow==2.70+nv22.01
-NOTHING CAN INSTALL WE ARE IN VERSION HELL
-CONCLUSION: we must use docker.
-
+	NOTHING CAN INSTALL WE ARE IN VERSION HELL
+	CONCLUSION: we must use docker.
 sudo docker pull nvcr.io/nvidia/l4t-tensorflow:r32.7.1-tf2.7-py3
 
 	
