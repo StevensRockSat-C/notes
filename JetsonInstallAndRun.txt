@@ -35,24 +35,24 @@ Run benchmark
 2-3-23 6:30 PM Nano test. 93. Reaches ~50C
 
 Keeps
-	1
-	2
-	4
-	5-6
-	7
-	9-10 Semantic Segmentation
-	15 [120 seconds]
+	1 -> 1
+	2 -> 2
+	4 -> ?
+	5-6 -> 2
+	7 -> ?
+	9-10 Semantic Segmentation -> 16
+	15 [120 seconds] -> ?
 	
 Maybe
-	11
-	12 [100 seconds]
+	11 -> ?
+	12 [100 seconds] -> ?
 
 Remove image processing, since satellites do not need to process images
-	16 [Done]
-	14 [Done]
-	13 [~37 seconds]
-	8
-	3
+	16 [Done] -> ?
+	14 [Done] -> 12
+	13 [~37 seconds] -> ?
+	8 -> ?
+	3 -> ?
 	
 Can't find tJuct max of the NVidia Jetson Cortex-A57 https://developer.arm.com/Processors/Cortex-A57#Resources
 
@@ -304,8 +304,8 @@ sudo pip3 install --extra-index-url https://developer.download.nvidia.com/comput
 	CONCLUSION: we must use docker.
 sudo docker pull nvcr.io/nvidia/l4t-tensorflow:r32.7.1-tf2.7-py3
 
-	
-**REFLASH** Jetpack 4.3.0
+3-28-23	
+**REFLASH SD NEW to Jetpack 4.3.0**
 sudo apt update
 sudo apt upgrade
 sudo apt-get install libhdf5-serial-dev hdf5-tools libhdf5-dev zlib1g-dev zip libjpeg8-dev liblapack-dev libblas-dev gfortran
@@ -316,7 +316,7 @@ sudo pip3 install --extra-index-url https://developer.download.nvidia.com/comput
 sudo pip3 install -U numpy grpcio absl-py py-cpuinfo psutil portpicker six mock requests gast h5py astor termcolor protobuf keras-applications keras-preprocessing wrapt goggle-pasta
 sudo pip3 install --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v43 tensorflow==2.1.0+nv20.3
 
-**REFLASH** JP 4.5
+**REFLASH SD NEW to JP 4.5**
 sudo apt update
 sudo apt-get install libhdf5-serial-dev hdf5-tools libhdf5-dev zlib1g-dev zip libjpeg8-dev liblapack-dev libblas-dev gfortran
 sudo apt-get install python3-pip
@@ -328,4 +328,6 @@ sudo pip3 install --extra-index-url https://developer.download.nvidia.com/comput
 		import tensorflow as tf
 		tf.test.gpu_device_name()
 		#TENSORFLOW SEES GPU
-		
+	run groundHighPrecision.py
+		GPU RAM 0.9 GB
+		We can run all tests up to 12 but 7
