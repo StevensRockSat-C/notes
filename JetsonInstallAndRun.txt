@@ -331,3 +331,6 @@ sudo pip3 install --extra-index-url https://developer.download.nvidia.com/comput
 	run groundHighPrecision.py
 		GPU RAM 0.9 GB
 		We can run all tests up to 12 but 7
+
+3/31/2023
+Tried Using 8Gb of swap memory instead of 4, realized swap memory is only used by cpu tests still crashed on 13/19
