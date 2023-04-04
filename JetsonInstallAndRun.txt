@@ -334,3 +334,20 @@ sudo pip3 install --extra-index-url https://developer.download.nvidia.com/comput
 
 3/31/2023
 Tried Using 8Gb of swap memory instead of 4, realized swap memory is only used by cpu tests still crashed on 13/19
+4/3/23
+Disables Swap Memory
+Run tests 14-19, 15 crashed (.5)
+Run tests 14, 16-19 exlcluding 15, 16 crashed (.6)
+Run tests 17-19, 17 crashed (.8)
+Run tests 18-19, 18 crashed 
+*Issue where 'tests_nano' had no content
+17 runs takes 3 minutes to initialize
+16 runs with 1.1 GPU RAM 
+7 runs with 1.1 GPU RAM
+
+LIST OF OOM TESTS: 13, 15, 18, 19
+
+Run tests excluding 7, 13, 15, 18, 19 (No ethernet) (tee ai-benchmark/4-3-23) (-u)
+GPU RAM .8 GB
+Tests ran Successfully (highprecision)
+
