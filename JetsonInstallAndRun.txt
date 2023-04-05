@@ -351,3 +351,37 @@ Run tests excluding 7, 13, 15, 18, 19 (No ethernet) (tee ai-benchmark/4-3-23) (-
 GPU RAM .8 GB
 Tests ran Successfully (highprecision)
 
+4/4/23
+*ALL TESTS RUNNING ON NORMAL PRECISION**
+sudo python3 -u ai-benchmark/runner.py | tee ai-benchmark/filename.txt
+Running tests 1-6 8-12 14 16 17
+	GPU RAM .5GB
+	test crashed at 16 womp womp (16 was only able to run on 1.1GB)
+Run tests 1-6 8-12 14 16 17 
+	GPU RAM .8Gb 
+	-15 nice
+	Successfully ran tests 1-6 8-12 14 16 17 
+	706s
+Run tests 1-6 8-12 14 16 17
+	GPU RAM 0.9GB 
+	-15 nice
+	728s
+Run tests 1-6 8-12 14 16
+	GPU RAM 1.1GB
+	-18 nice
+	*Crashing Other Programs*
+	536s
+Run tests 1-6 8-12 14 16
+	GPU RAM 0.9GB
+	-16 nice
+	512s
+	
+
+	
+
+
+
+	
+	
+
+
