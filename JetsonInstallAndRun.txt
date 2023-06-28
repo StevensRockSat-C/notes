@@ -376,12 +376,38 @@ Run tests 1-6 8-12 14 16
 	-16 nice
 	512s
 	
-
+4/22/23
+Install serial
+	sudo pip3 install pyserial
+Tried connecting the raspberry pi and the jetson
+	It creates some sort of instability in the pi. Sometimes the pi will brick or fail to boot entirely
+	Can't get data across the line
 	
+5/1/23
+	Install the runner as a service
+		Run automatically with 
+			sudo bash -c 'python3 -u ~/Documents/AIR/jetson/runner.py |& tee ~/Documents/$(date +%s%3N)_GPU_log.txt' &
+    
+        
+        [Unit]
+        Description=Benchmark Service
 
+        [Service]
+        Type=simple
+        Environment=PYTHONPATH=/home/rocksat/.local/lib/python3.6/site-packages
+        ExecStart=/bin/bash -c 'python3 -u /home/rocksat/Documents/AIR/jetson/runner.py |& tee /home/rocksat/Documents/$(date +%%s%%3N)_GPU_log.txt" &'
 
-
+        [Install]
+        WantedBy=multi-user.target
+        
+        
+        sudo systemctl daemon-reload
+        sudo systemctl enable benchmark-service.service
 	
 	
+	3:57 PM: Start a on-boot, no screen test for the first time
 
-
+5/2/23
+Run FMSR
+	All the files save with the same time, I think because we weren't actually shutting down
+	Our log: 1680656929867_GPU_log.txt

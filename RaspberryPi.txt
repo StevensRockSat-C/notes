@@ -1,0 +1,197 @@
+Flash 32-bit Raspbian to MicroSD
+User: rocksat-pi-1
+Password: rocksat
+
+Update and Upgrade
+
+Add the following lines to /boot/config.txt
+	disable_splash=1: This line disables the rainbow splash screen that appears on booting your Raspberry Pi OS. It is also present in other raspberry Linux distro.
+	dtoverlay=disable-bt: This line disables Bluetooth connections in your system. Therefore, if your project utilizes Bluetooth, you shouldn’t add this.
+	boot_delay=0: By default, this value is set to 1second if not specified.
+Delete the 'splash' parameter from /boot/cmdline.txt
+Remove Plymouth (sudo apt purge --remove plymouth)
+sudo raspi-config
+	Interface
+		Disable SSH, VNC, Legacy Camera
+		Enable I2C
+	System
+		Disable network at boot
+sudo reboot
+Disable slow services
+	sudo systemctl disable raspi-config.service
+	sudo systemctl disable dphys-swapfile.service
+	sudo systemctl disable keyboard-setup.service
+	sudo systemctl disable triggerhappy.service
+	sudo systemctl disable rng-tools-debian.service
+	sudo systemctl disable cups.service
+	sudo systemctl disable wpa_supplicant.service
+	
+
+2-17-23
+**** Questions ****
+How should we attach the pins/wires to the MPRLS sensor?
+The G2 sensor is going to need a Shunt
+	OR THIS :D https://www.adafruit.com/product/904
+
+RaspberryPi boot tests
+1) BEFORE I2C
+	9.29 to kernal
+	31.37 to desktop
+	
+Getting i2c going
+	RPi Configuration -> Interfaces -> I2C On
+	sudo pip3 install smbus2    (https://pypi.org/project/smbus2/)
+	sudo reboot
+	Install Adafruit CircuitPython Libs
+		sudo pip3 install adafruit-circuitpython-lis3dh   (https://github.com/adafruit/Adafruit_CircuitPython_Bundle)
+		sudo pip3 install adafruit-circuitpython-mprls  (https://docs.circuitpython.org/projects/mprls/en/latest/index.html)
+		sudo pip3 install adafruit-circuitpython-tca9548a (https://learn.adafruit.com/adafruit-tca9548a-1-to-8-i2c-multiplexer-breakout/circuitpython-python)
+		sudo pip3 install adafruit-circuitpython-ds3231 (https://learn.adafruit.com/adafruit-ds3231-precision-rtc-breakout/circuitpython)
+Solder and wire the MPRLS sensor
+Run sudo i2cdetect -y 1
+	Outputs at 0x18
+python3 tankpressure-test.py
+	---> Errno 121 Remote I/O
+	Install adafruit-extended-bus
+		sudo pip3 install adafruit-extended-bus
+		Didn't work
+	Tried adding >5 second delay, not it
+	Modify the baudrate
+		sudo nano /boot/config.txt
+			dtparam=i2c_arm=on,i2c_arm_baudrate=400000
+		also tried 50,000. Nothing.
+		
+3-3-23
+Updated raspi-config
+Enabled i2c, again
+Run sudo i2cdetect -y 1
+	Outputs at 0x18
+sudo python3 tankpressure-test.py
+	WORKS! Reads ~1016 hPa. My phone reads 1013.1 hPa. Success!
+
+3-19-23 -> 3-21-23
+	Used the i2c mutliplexer
+	Success, used https://github.com/StevensRockSat-C-2022-23/sensor-tests/blob/main/MPRLS/multiple-pressures.py
+
+Research on sleep timings
+	https://stackoverflow.com/questions/1133857/how-accurate-is-pythons-time-sleep
+	https://pythonspot.com/sleep/
+	It seems we should sleep 1ms less than we want
+	Perhaps we use a loop to check time instead of sleeping?
+	
+Research on batteries
+	https://www.wired.com/2012/10/could-you-start-your-car-with-d-cell-batteries/
+	Internal resistance of a D-cell is ~0.2Ω. So, with 10 in a row, 15V / 2Ω is 7.5A max draw. That's enough for us
+		10 D-cells is 3.75 lb
+		
+3-??-23
+RTC Setup
+	Install CircuitPython for DS3231 (sudo pip3 install adafruit-circuitpython-ds3231) (https://learn.adafruit.com/adafruit-ds3231-precision-rtc-breakout/circuitpython)
+	
+4-7-23
+Flash one of the Jetson Nano MicroSDs (the red & black one) with 32-bit Raspbian (standard)
+Issues running all the transistors at once. I think it's something to do with the pull down resistance?
+	v=ir
+		12 = 0.05 * r
+		r = 240
+		5 = 0.4 * r
+		r = 12.5
+		
+	PARKER MAIN RESISTOR TESTING
+		270 ohm pulldown, 3000 ohm to transistor -> 3 mA DOESN'T WORK
+		680 ohm, 3000 ohm to transistor -> 35 mA WORKS ON LATER TESTS
+		1500 ohm, 3000 ohm to transistor -> 67 mA WORKS
+		NO PULLDOWN, 3000 ohm to transistor -> 95 mA WORKS
+		
+		PD: 680, Tran: 3000
+			35mA & 0.937V idle
+			200 mA pull NO ACTUATION
+			
+		PD: 680, Tran: 1500
+			60mA & 0.96V idle
+			281 mA pull
+			Sometimes misses the first actuation as it builds up current draw
+			
+		PD: 680, Tran: 1000
+			90mA -> inf & 0.90V idle
+			300 mA pull
+			
+		PD: 680, Tran: 270
+			180mA, asymptotic idle
+			377 mA pull
+		
+			
+		PD: 270, Tran: 1500
+			0mA idle
+			270 mA pull
+			
+		PD: 150, Tran: 1500
+			0mA idle
+			258 mA pull
+			
+	We determined that the min amp pull of the 11/25/26 is somewhere between 200-250 mA
+	
+	
+4-15-23
+Set up 2nd RaspberryPi
+User: rocksat-pi-2
+Password: rocksat
+
+Update and upgrade
+
+Turn on i2c and turn off splash screen in config
+Add the following lines to /boot/config.txt
+	disable_splash=1: This line disables the rainbow splash screen that appears on booting your Raspberry Pi OS. It is also present in other raspberry Linux distro.
+	dtoverlay=disable-bt: This line disables Bluetooth connections in your system. Therefore, if your project utilizes Bluetooth, you shouldn’t add this.
+	boot_delay=0: By default, this value is set to 1second if not specified.
+Remove Plymouth (sudo apt purge --remove plymouth)
+sudo raspi-config
+	System
+		Disable network at boot
+sudo reboot
+
+Install Adafruit CircuitPython Libs
+	sudo pip3 install adafruit-circuitpython-lis3dh   (https://github.com/adafruit/Adafruit_CircuitPython_Bundle)
+	sudo pip3 install adafruit-circuitpython-mprls  (https://docs.circuitpython.org/projects/mprls/en/latest/index.html)
+	sudo pip3 install adafruit-circuitpython-tca9548a (https://learn.adafruit.com/adafruit-tca9548a-1-to-8-i2c-multiplexer-breakout/circuitpython-python)
+	sudo pip3 install adafruit-circuitpython-ds3231 (https://learn.adafruit.com/adafruit-ds3231-precision-rtc-breakout/circuitpython)
+	sudo pip3 install adafruit-extended-bus
+	
+
+5-2-23
+Run the main script
+	First output looks good
+Install the runner as a service
+sudo nano /etc/systemd/system/rocket-service.service
+	[Unit]
+	Description=RockSat Rocket Service
+
+	[Service]
+	Type=simple
+	Environment=PYTHONPATH=/usr/local/lib/python3.9/dist-packages
+	ExecStart=/bin/bash -c 'python3 /home/rocksat-pi-1/Documents/AIR/pi/main.py' &
+
+	[Install]
+	WantedBy=multi-user.target
+	
+	
+	sudo systemctl daemon-reload
+	sudo systemctl enable rocket-service.service
+	
+5-12-23
+When we boot, it shuts down immediately
+	This is bc of NTP grabbing a time more forward than 10 minutes into the "future" (the time since last ntp)
+WE STILL HEAR A VALVE CLICK WHEN POWER IS UNPLUGGED
+	Sounds like the park
+	
+batteries 22.02 V -> 21.9 V
+
+5/13/23
+batteries 21.9 V -> 21.5 V
+
+Testing new Tran resistor on Parer
+		PD: 680, Tran: 470
+			164 mA, asymptotic idle
+			383 mA pull
+			Did it miss a couple of the sampling activations? (I heard other valves fire for collctions 2&3, but no power pulled on the Parker)
+batteries 21.5 V -> 21.0 V
