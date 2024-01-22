@@ -1,0 +1,4 @@
+Jan 22, 2024
+#to read values from ADXL372 accelerometer
+sudo pip3 install spidev
+#went into raspberry PI configuration and turned on spidev by running "python3 Accelerometer/ADXL372/adxl372_test.py" in folder sensor-tests
