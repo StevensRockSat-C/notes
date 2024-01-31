@@ -1,4 +1,13 @@
 Jan 22, 2024
-#to read values from ADXL372 accelerometer
+to read values from ADXL372 accelerometer: 
 sudo pip3 install spidev
-#went into raspberry PI configuration and turned on spidev by running "python3 Accelerometer/ADXL372/adxl372_test.py" in folder sensor-tests
+went into raspberry PI configuration and turned on spidev by running "python3 Accelerometer/ADXL372/adxl372_test.py"
+in folder sensor-tests
+
+Jan 31, 2024
+trying to use spidev library for python
+sudo pip3 install adafruit-circuitpython-adxl37x 
+sudo apt-get update
+Decided to switch to c since python won't be fast enough to read at the frequency we need.
+Had ChatGPT generate a script to start reading values. The script is running but not recieving values. Will look more into
+how the script is working and what registers it is using. 
