@@ -11,3 +11,31 @@ sudo apt-get update
 Decided to switch to c since python won't be fast enough to read at the frequency we need.
 Had ChatGPT generate a script to start reading values. The script is running but not recieving values. Will look more into
 how the script is working and what registers it is using. 
+
+Feb 5
+The python script is receiving (mostly correct) values. Anthony ran Matlab tests to plot the data and found that we have
+perfect harmonics in the data. Tried running the c code and didn't get any values. Changed the library to 
+https://github.com/LdB-ECM/linux_device_access/blob/master/spi.c (stored in accessLibs) and rewrote the code to use the 
+library.
+
+Feb 7
+Fixed a bunch of compilation errors in the code written on Feb 5. Then got a seg fault, most likely becuase the library wasn't
+being compiled with the c code. Used command "g++ -pthread -shared adxl372_withSPIlib.c accessLibs/spi.c" to compile c code
+and library in the same folder
+
+Feb 9, 2024
+Worked on precompiling the library so we don't have to recompile it each time. Made a .a file following 
+https://www.cs.dartmouth.edu/~campbell/cs50/buildlib.html and moved it into ADXL372. Will try to find a way to move it back to
+accessLibs without getting errors. Ran command "g++ -pthread adxl372_withSPIlib.c" to compile c code. 
+Code ran but the values weren't correct. x was always 160 and y and z 0, and the status register was empty. We switched the order
+that x and y were getting read in (in case one reading was messing up others) but recieved the same values. Tried all 4 spi modes
+and they returned different values for x but nothing else changed. Settled on mode 2 as detailed in the data sheet. 
+
+Feb 10
+Worked on reading values from the ADXL1001. 
+Setup with DAQ:  (ADXL1001 -> DAQ)
+  Vou -> C0
+  GND -> AGND
+  Vdd -> 5V
+Downloaded library from https://mccdaq.github.io/daqhats/install.html#creating-a-c-program but made the library a submodule in
+Git. Tried running the sample file (single_value_read) which gave values!
