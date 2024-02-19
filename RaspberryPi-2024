@@ -39,3 +39,11 @@ Setup with DAQ:  (ADXL1001 -> DAQ)
   Vdd -> 5V
 Downloaded library from https://mccdaq.github.io/daqhats/install.html#creating-a-c-program but made the library a submodule in
 Git. Tried running the sample file (single_value_read) which gave values!
+
+Feb 14
+Recorded data from ADXL1001 to analyze
+ADXL372 doesn't read data at all when connected to the DaqHat
+Ran C code adxl372_withSPIlib.c and got some y values
+  status reg was 00000010, so we are in buffer mode
+  must set FIFO reg (0x3A) to 0b00 to turn off buffer mode
+ran into library problems again :(
