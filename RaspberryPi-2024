@@ -54,6 +54,15 @@ Attempted to turn on the buffer mode, was unsuccessful in SPI
 Tried using i2c but was also unsuccessful
 Most likely using ADXL1001 now
 
+Feb 25
+Started wrapper for daqHat based off of continuous_scan.py in the examples folder
+Started profiling batteries
+  Attempted to use current measurement circuit (like Ashcroft G2) but resistors couldn't handle load
+  Using HiTec RDX1 in discharge mode with charge master software to get curves
+    takes about 50 minutes per battery
+    did one battery today
+  
+
 TODO
 MCC128 code for python
 make wrapper for it. should be instantiable by main script, call function to get buffer from certain channel
@@ -62,4 +71,7 @@ make wrapper for it. should be instantiable by main script, call function to get
 communicate w/ SPI, or I2C but SPI preferred
 
 should be SPI code in python for daq hat
+
+
+
 
