@@ -70,7 +70,7 @@ Profiled the rest of the batteries - they are good!
 Mar 4
 Worked on daqhat wrapper (csv formatting, closing files correctly)
 
-Mar 25
+Mar 18
 Writes to file in csv format but timing is off
   Need to make code more efficient
 Did math for conversion values of voltage to acceleration
