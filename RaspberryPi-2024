@@ -62,6 +62,11 @@ Started profiling batteries
     takes about 50 minutes per battery
     did one battery today
 
+
+Feb 29
+Continued working on wrapper
+Profiled the rest of the batteries - they are good!
+
 Mar 4
 Worked on daqhat wrapper (csv formatting, closing files correctly)
 
