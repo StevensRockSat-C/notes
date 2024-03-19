@@ -61,6 +61,15 @@ Started profiling batteries
   Using HiTec RDX1 in discharge mode with charge master software to get curves
     takes about 50 minutes per battery
     did one battery today
+
+Mar 4
+Worked on daqhat wrapper (csv formatting, closing files correctly)
+
+Mar 25
+Writes to file in csv format but timing is off
+  Need to make code more efficient
+Did math for conversion values of voltage to acceleration
+Started work on filters
   
 
 TODO
