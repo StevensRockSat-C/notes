@@ -75,6 +75,16 @@ Writes to file in csv format but timing is off
   Need to make code more efficient
 Did math for conversion values of voltage to acceleration
 Started work on filters
+
+
+
+
+Mar 24
+Timing stuff:
+  whole buffer is being read, so either we're losing data or it makes sure that when it 
+  finishes its call that EVERTYHING is in buffer
+time once we're at the start point is getting calculated correctly - including jumpback
+
   
 
 TODO
