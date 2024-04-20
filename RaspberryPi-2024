@@ -100,4 +100,8 @@ When the RBF wire is connected and the reset button is in the off position, or i
 button was flipped to the out position, if the reset button is then pushed back in the in position within 2-3 seconds, there's 
 enough trickle current to re-engage the system without the RBF wires connected.
 
-
+April 20
+Tests to complete today:
+ - S.1.SYS.1
+ - 15 minutes of vibration
+ - 
