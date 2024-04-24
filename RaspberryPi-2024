@@ -99,6 +99,8 @@ should be SPI code in python for daq hat
 When the RBF wire is connected and the reset button is in the off position, or if the system was just powered and the reset
 button was flipped to the out position, if the reset button is then pushed back in the in position within 2-3 seconds, there's 
 enough trickle current to re-engage the system without the RBF wires connected.
+Trickle current persists for around 2 seconds. Need to wait at least three seconds for the system to not be re-engaged without
+the RBF wires connected when the reset button is pushed.
 
 April 20
 Tests to complete today:
